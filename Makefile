@@ -1,7 +1,6 @@
 
 .PHONY: all
-all:
-#all: c asm pas
+all: c pas # asm
 
 clean:
 	rm -f imagefilter_s imagefilter_p imagefilter_c
@@ -12,7 +11,7 @@ asm:
 
 .PHONY: pas
 pas:
-	fpc imagefilter.pas -o imagefilter_p
+	fpc imagefilter.pas -oimagefilter_p
 
 .PHONY: c
 c:
