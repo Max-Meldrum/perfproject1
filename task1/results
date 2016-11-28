@@ -1,0 +1,68 @@
+Enter number of iterations:1 
+Computing result
+Writing result
+
+real	0m7.324s
+user	0m0.004s
+sys	0m0.000s
+
+
+Enter number of iterations:5
+Computing result
+Writing result
+
+real	0m1.402s
+user	0m0.016s
+sys	0m0.000s
+
+
+Enter number of iterations:25
+Computing result
+Writing result
+
+real	0m2.263s
+user	0m0.044s
+sys	0m0.000s
+
+
+Enter number of iterations:50
+Computing result
+Writing result
+
+real	0m1.723s
+user	0m0.088s
+sys	0m0.000s
+
+Enter number of iterations:100
+Computing result
+Writing result
+
+real	0m3.450s
+user	0m0.168s
+sys	0m0.000s
+
+Enter number of iterations:500
+Computing result
+Writing result
+
+real	0m2.864s
+user	0m0.784s
+sys	0m0.000s
+
+
+Enter number of iterations:1000
+Computing result
+Writing result
+
+real	0m2.449s
+user	0m1.536s
+sys	0m0.000s
+
+Enter number of iterations:5000
+Computing result
+Writing result
+
+real	0m9.473s
+user	0m7.700s
+sys	0m0.000s
+
