@@ -1,0 +1,4 @@
+*.o
+imagefilter_c
+imagefilter_s
+imagefilter_p
