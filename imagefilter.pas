@@ -42,19 +42,19 @@ begin
         for j := 0 to 255 do
                 dataout^ [i][j] := datain^ [i][j];
 
- (* Okay, here's where all the work takes place. The outside                                                            *)
- (* loop repeats this blurring operation the number of                                                          *)
- (* iterations specified by the user.                                                           *)
+ (* Okay, here's where all the work takes place. The outside *)
+ (* loop repeats this blurring operation the number of *)
+ (* iterations specified by the user. *)
 
  for h := 1 to iterations do begin
 
-        (* For each row except the first and the last, compute                                                  *)
-        (* a new value for each element.                                                        *)
+        (* For each row except the first and the last, compute *)
+        (* a new value for each element. *)
 
         for i := 1 to 249 do
 
-                (* For each column except the first and the last, com-                                                  *)
-                (* pute a new value for each element.                                                   *)
+                (* For each column except the first and the last, com- *)
+                (* pute a new value for each element. *)
 
                 for j := 1 to 254 do begin
 
@@ -81,9 +81,9 @@ begin
 
                 end;
 
-                (* Copy the output cell values back to the input cells                                                  *)
-                (* so we can perform the blurring on this new data on                                                   *)
-                (* the next iteration.                                                  *)
+                (* Copy the output cell values back to the input cells *)
+                (* so we can perform the blurring on this new data on *)
+                (* the next iteration. *)
 
                 for i := 0 to 250 do
                     for j := 0 to 255 do
