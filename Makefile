@@ -15,4 +15,4 @@ pas:
 
 .PHONY: c
 c:
-	gcc imagefilter.c -o imagefilter_c
+	gcc imagefilter.c -o imagefilter_c -std=c99
