@@ -9,8 +9,8 @@ int main(int argc, char* argv){
     FILE* fin = fopen("roller1.raw", "r");
     FILE* fout = fopen("roller2.raw", "w");
 
-    char in[W][H];
-    char out[W][H];
+    unsigned char in[W][H];
+    unsigned char out[W][H];
 
     int itercount;
     printf("iterations: ");
@@ -31,7 +31,6 @@ int main(int argc, char* argv){
                         sum += in[x+xa][y+ya];
                     }
                 }
-                sum -= in[x][y];
                 // bordering pixels have 50% weight and original pixel has 50% weight
                 out[x][y] = (( sum + in[x][y]*7 ) / 16 ) % 255;
             }
