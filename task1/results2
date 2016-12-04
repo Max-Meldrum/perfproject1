@@ -1,0 +1,50 @@
+1 iter
+real	0m0.072s
+user	0m0.056s
+sys	0m0.008s
+
+10 iter
+real	0m0.085s
+user	0m0.064s
+sys	0m0.012s
+
+
+25 iter
+real	0m0.108s
+user	0m0.084s
+sys	0m0.016s
+
+
+50 iter
+real	0m0.140s
+user	0m0.124s
+sys	0m0.012s
+
+
+150 iter 
+real	0m0.289s
+user	0m0.268s
+sys	0m0.012s
+
+500 iter
+real	0m0.805s
+user	0m0.780s
+sys	0m0.020s
+
+
+1500 iter
+real	0m2.283s
+user	0m2.268s
+sys	0m0.008s
+
+3000 iter
+real	0m4.523s
+user	0m4.496s
+sys	0m0.020s
+
+
+10000 iter
+real	0m14.832s
+user	0m14.808s
+sys	0m0.012s
+
