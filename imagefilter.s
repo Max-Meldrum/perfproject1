@@ -22,7 +22,6 @@
 #                includelib      stdlib.lib
 #                .list 286
 
-#dseg            segment para public 'data'
 .data
 
 # Loop control variables and other variables:
@@ -37,12 +36,8 @@ iterations:      .word
 
 InSeg:           .word
 OutSeg:          .word
-dseg:            .word
 
-# File names:
 
-InName:          .asciz    "roller1.raw"
-OutName:         .asciz    "roller2.raw"
 
 CantOpenFileMsg:    .asciz    "Could not open input file."
 CantReadFileMsg:    .asciz    "Did not read the file properly"
@@ -52,7 +47,12 @@ WriteResultsMsg:    .asciz    "Writing result"
 CouldntCreateOutFileMsg:.asciz    "Could not create output file."
 BadWriteMsg:        .asciz    "Did not write the file properly"
 
+ScanfDigitInput:    .asciz "%d"
 
+# File names:
+
+InName:          .asciz    "roller1.raw"
+OutName:         .asciz    "roller2.raw"
 
 # Here is the input data that we operate on.
 .bss
@@ -62,32 +62,31 @@ BadWriteMsg:        .asciz    "Did not write the file properly"
 .lcomm fd_out 1
 
 #DataIn:          .byte    251 dup (256 dup (?))
-DataIn:         .space 64256 # 251*256
+DataIn:         .space 251*256 # 251*256
 
 
 # Here is the output array that holds the result.
 
 #DataOut         byte    251 dup (256 dup (?))
-DataOut:        .space    64256 # 251*256
+DataOut:        .space    251*256 # 251*256
 
 # Code
 .text
 
 .global main
 main:
- //               mov     $0x3d00, %ax               # Open input file for reading.
- //               lea     InName, %dx
- //               int     $0x21
                 // Open file for reading
                 mov     $5, %eax
                 mov     $InName, %ebx
                 mov     $0, %ecx
                 mov     $0666, %edx
                 int     $0x80
+                mov     %eax, fd_in
 
                 cmp     $0, %eax
                 jg      GoodOpen
-                mov     $CantOpenFileMsg, %eax
+
+BadOpen:        mov     $CantOpenFileMsg, %eax
                 subl    $16, %esp
                 push    %eax
                 call    puts
@@ -95,16 +94,6 @@ main:
                 jmp     Quit
 
 GoodOpen:       
-
-               // mov     %ax, %bx                  # File handle.
-               // mov     InSeg, %dx               # Where to put the data.
-                //mov     %dx, %ds
-                //lea     DataIn, %dx
-                //mov     $256*251, %cx             #Size of data file to read.
-                //mov     $0x3F, %ah
-                //int     $0x21
-
-                mov     %eax, fd_in
                 mov     $3, %eax
                 mov     fd_in, %ebx
                 mov     $InSeg, %ecx
@@ -113,7 +102,7 @@ GoodOpen:
 
                 cmp     $0, %ax             #See if we read the data
 
-                jge      GoodRead
+                jge     GoodRead
                 mov     $CantReadFileMsg, %eax
                 subl    $16, %esp
                 push    %eax
@@ -121,20 +110,29 @@ GoodOpen:
                 addl    $16, %esp
                 jmp     Quit
 
-GoodRead:       mov     dseg, %ax
-                mov     %ax, %ds
-                push    EnterNumberMsg
+GoodRead:       # close the file
+                mov $6, %eax
+                mov fd_in, %ebx
+
+GoodClose:      # Print "iterations:" question
+                mov     $EnterNumberMsg, %eax
+                subl    $16, %esp
+                push    %eax
                 call    puts
-                # TODO: Fix iterations
-                #getsm
-                mov     $5, %ax
-                push    %ax
-                call    atoi
-                # TODO: What does this do?
-                #free
-                mov     iterations, %ax
-                push    ComputeResultsMsg
+                addl    $16, %esp
+                # Get input
+                mov     $ScanfDigitInput, %eax
+                subl    $16, %esp
+                push    %eax
+                call    scanf
+                addl    $16, %esp
+                mov     %eax, iterations
+                # Print compute msg 
+                mov     $ComputeResultsMsg, %eax
+                subl    $16, %esp
+                push    %eax
                 call    puts
+                addl    $16, %esp
 
 # Copy the input data to the output buffer.
 
@@ -175,9 +173,8 @@ jDone0:         push    %ax
                 mov     %ax, i
                 pop     %ax
                 jmp     iloop0
-
 iDone0:
-
+/*
 # for h := 1 to iterations-
 
                 mov     $1, %ax
@@ -321,39 +318,61 @@ iDone1:         mov     h, %bx
                 inc     %bx
                 mov     %bx, h
                 jmp     hloop
+*/
 
-hloopDone:      push    WriteResultsMsg
+
+                // Create file for writing
+                /*
+                */
+                // Open file for writing
+                /*
+                */
+
+
+hloopDone:
+                mov     $WriteResultsMsg, %eax
+                subl    $16, %esp
+                push    %eax
                 call    puts
+                addl    $16, %esp
 
-
-# Okay, write the data to the output file:
-
-                mov     $0x3c, %ah         #Create output file.
-                mov     $0, %cx              #Normal file attributes.
-                lea     OutName, %dx
-                int     $0x21
-                jnc     GoodCreate
-                push    CouldntCreateOutFileMsg
+                // Create and open file for writing
+                mov     $8, %eax
+                mov     $OutName, %ebx
+                mov     $0666, %ecx        #read, write and execute by all
+                int     $0x80             #call kernel
+	            mov     %eax, fd_out
+                
+                cmp     $-1, %eax
+                jg      GoodCreate
+                mov     $CouldntCreateOutFileMsg, %eax
+                subl    $16, %esp
+                push    %eax
                 call    puts
+                addl    $16, %esp
                 jmp     Quit
 
-GoodCreate:     mov     %ax, %bx          #File handle.
-                push    %bx
-                mov     OutSeg, %dx      #Where the data can be found.
-                mov     %dx, %ds
-                lea     DataOut, %dx
-                mov     $256*251, %cx     #Size of data file to write.
-                mov     $0x40, %ah         #Write operation.
-                int     $0x21
-                pop     %bx              #Retrieve handle for close.
-                cmp     $256*251, %ax     #See if we wrote the data.
+GoodCreate:     // Write to file
+                mov     $251*256, %edx
+                mov     $DataOut, %ecx
+                mov     fd_out, %ebx
+                mov     $4, %eax
+                int     $0x80
+                
+                cmp     $251*256, %eax
                 je      GoodWrite
-                push    BadWriteMsg
+                
+                mov     $BadWriteMsg, %eax
+                subl    $16, %esp
+                push    %eax
                 call    puts
+                addl    $16, %esp
                 jmp     Quit
 
-GoodWrite:      mov     $0x3e, %ah         #Close operation.
-                int     $0x21
+GoodWrite:      
+                # close the file
+                mov $6, %eax
+                mov fd_out, %ebx
 
 
 Quit:           //ExitPgm                 #DOS macro to quit program.
