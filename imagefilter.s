@@ -44,18 +44,22 @@ dseg:            .word
 InName:          .asciz    "roller1.raw"
 OutName:         .asciz    "roller2.raw"
 
-CantOpenFileMsg:    .asciz    "Could not open input file.\n"
-CantReadFileMsg:    .asciz    "Did not read the file properly\n"
+CantOpenFileMsg:    .asciz    "Could not open input file."
+CantReadFileMsg:    .asciz    "Did not read the file properly"
 EnterNumberMsg:     .asciz    "Enter number of iterations: "
-ComputeResultsMsg:  .asciz    "Computing Result\n"
-WriteResultsMsg:    .asciz    "Writing result\n"
-CouldntCreateOutFileMsg:.asciz    "Could not create output file.\n"
-BadWriteMsg:        .asciz    "Did not write the file properly\n"
+ComputeResultsMsg:  .asciz    "Computing Result"
+WriteResultsMsg:    .asciz    "Writing result"
+CouldntCreateOutFileMsg:.asciz    "Could not create output file."
+BadWriteMsg:        .asciz    "Did not write the file properly"
 
 
 
 # Here is the input data that we operate on.
 .bss
+
+// For file reading??
+.lcomm fd_in 1
+.lcomm fd_out 1
 
 #DataIn:          .byte    251 dup (256 dup (?))
 DataIn:         .space 64256 # 251*256
@@ -71,25 +75,50 @@ DataOut:        .space    64256 # 251*256
 
 .global main
 main:
-                mov     $0x3d00, %ax               # Open input file for reading.
-                lea     InName, %dx
-                int     $0x21
-                jnc     GoodOpen
-                push    CantOpenFileMsg
+ //               mov     $0x3d00, %ax               # Open input file for reading.
+ //               lea     InName, %dx
+ //               int     $0x21
+                // Open file for reading
+                mov     $5, %eax
+                mov     $InName, %ebx
+                mov     $0, %ecx
+                mov     $0666, %edx
+                int     $0x80
+
+                cmp     $0, %eax
+                jg      GoodOpen
+                mov     $CantOpenFileMsg, %eax
+                subl    $16, %esp
+                push    %eax
                 call    puts
+                addl    $16, %esp
                 jmp     Quit
 
-GoodOpen:       mov     %ax, %bx                  # File handle.
-                mov     InSeg, %dx               # Where to put the data.
-                mov     %dx, %ds
-                lea     DataIn, %dx
-                mov     $256*251, %cx             #Size of data file to read.
-                mov     $0x3F, %ah
-                int     $0x21
-                cmp     $256*251, %ax             #See if we read the data.
-                je      GoodRead
-                push    CantReadFileMsg
+GoodOpen:       
+
+               // mov     %ax, %bx                  # File handle.
+               // mov     InSeg, %dx               # Where to put the data.
+                //mov     %dx, %ds
+                //lea     DataIn, %dx
+                //mov     $256*251, %cx             #Size of data file to read.
+                //mov     $0x3F, %ah
+                //int     $0x21
+
+                mov     %eax, fd_in
+                mov     $3, %eax
+                mov     fd_in, %ebx
+                mov     $InSeg, %ecx
+                mov     $26, %edx
+                int     $0x80
+
+                cmp     $0, %ax             #See if we read the data
+
+                jge      GoodRead
+                mov     $CantReadFileMsg, %eax
+                subl    $16, %esp
+                push    %eax
                 call    puts
+                addl    $16, %esp
                 jmp     Quit
 
 GoodRead:       mov     dseg, %ax

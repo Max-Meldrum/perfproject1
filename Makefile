@@ -7,7 +7,7 @@ clean:
 
 .PHONY: asm
 asm:
-	gcc -m32 imagefilter.s -o imagefilter_s
+	gcc -g -m32 imagefilter.s -o imagefilter_s
 
 .PHONY: pas
 pas:
