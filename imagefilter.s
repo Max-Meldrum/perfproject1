@@ -35,18 +35,22 @@ l:               .word
 sum:             .word
 iterations:      .word
 
+InSeg:           .word
+OutSeg:          .word
+dseg:            .word
+
 # File names:
 
-InName:          .byte    "roller1.raw",0
-OutName:         .byte    "roller2.raw",0
+InName:          .asciz    "roller1.raw"
+OutName:         .asciz    "roller2.raw"
 
-CantOpenFileMsg:    .byte    "Could not open input file.",cr,lf,0
-CantReadFileMsg:    .byte    "Did not read the file properly",cr,lf,0
-EnterNumberMsg:     .byte    "Enter number of iterations: ",0
-ComputeResultsMsg:  .byte    "Computing Result",cr,lf,0
-WriteResultsMsg:    .byte    "Writing result",cr,lf,0
-CouldntCreateOutFileMsg:.byte    "Could not create output file.",cr,lf,0
-BadWriteMsg:        .byte    "Did not write the file properly",cr,lf,0
+CantOpenFileMsg:    .asciz    "Could not open input file.\n"
+CantReadFileMsg:    .asciz    "Did not read the file properly\n"
+EnterNumberMsg:     .asciz    "Enter number of iterations: "
+ComputeResultsMsg:  .asciz    "Computing Result\n"
+WriteResultsMsg:    .asciz    "Writing result\n"
+CouldntCreateOutFileMsg:.asciz    "Could not create output file.\n"
+BadWriteMsg:        .asciz    "Did not write the file properly\n"
 
 
 
@@ -77,7 +81,7 @@ main:
 
 GoodOpen:       mov     %ax, %bx                  # File handle.
                 mov     InSeg, %dx               # Where to put the data.
-                mov     %dx, ds
+                mov     %dx, %ds
                 lea     DataIn, %dx
                 mov     $256*251, %cx             #Size of data file to read.
                 mov     $0x3F, %ah
@@ -89,7 +93,7 @@ GoodOpen:       mov     %ax, %bx                  # File handle.
                 jmp     Quit
 
 GoodRead:       mov     dseg, %ax
-                mov     %ax, ds
+                mov     %ax, %ds
                 push    EnterNumberMsg
                 call    puts
                 # TODO: Fix iterations
@@ -120,12 +124,14 @@ jloop0:         mov     j, %bx
                 add     j, %bx                   # i*256+j (row major).
 
                 mov     InSeg, %cx               #Point at input segment.
-                mov     %cx, es
-                mov     es:DataIn[%bx], %al       #Get DataIn[i][j].
+                mov     %cx, %es
+                //mov   %es:DataIn[%bx], %al       #Get DataIn[i][j].
+                mov     DataIn(, %ebx, 1), %al
 
                 mov     OutSeg, %cx              #Point at output segment.
-                mov     %cx, es
-                mov     %al, es:DataOut[%bx]      #Store into DataOut[i][j]
+                mov     %cx, %es
+                //mov     %al, es:DataOut[%bx]      #Store into DataOut[i][j]
+                mov     %al, DataOut(, %ebx, 1)
 
                 push    %ax
                 mov     j, %ax
@@ -173,7 +179,7 @@ jloop:          mov     j, %bx
 # for k := -1 to 1 do for l := -1 to 1 do
 
                 mov     InSeg, %ax               #Gain access to InSeg.
-                mov     %ax, es
+                mov     %ax, %es
 
                 mov     $0, %bx
                 mov     %bx, sum
@@ -197,9 +203,10 @@ lloop:          mov     k, %bx
                 add     j, %bx
                 add     l, %bx
 
-                mov     es:DataIn[%bx], %al
+                //mov     es:DataIn[%bx], %al
+                mov     DataIn(, %ebx, 1), %al
                 mov     $0, %ah
-                add     %ax, Sum
+                add     %ax, sum
 
                 mov     l, %bx
                 inc     %bx
@@ -217,19 +224,21 @@ lloopDone:      mov     k, %bx
 kloopDone:      mov     i, %bx
                 shl     $8, %bx                   #*256
                 add     j, %bx
-                mov     es:DataIn[bx], %al
+                //mov     es:DataIn[bx], %al
+                mov     DataIn(, %ebx, 1), %al
                 mov     $0, %ah
                 imul    $7, %ax
                 add     sum, %ax
                 shr     $4, %ax                   #div 16
 
                 mov     OutSeg, %bx
-                mov     %bx, es
+                mov     %bx, %es
 
                 mov     i, %bx
                 shl     $8, %bx
                 add     j, %bx
-                mov     %al, es:DataOut[bx]
+                //mov     %al, es:DataOut[bx]
+                mov     %al, DataOut(, %ebx, 1)
 
                 mov     j, %bx
                 inc     %bx
@@ -260,12 +269,14 @@ jloop1:         mov     j, %bx
                 add     j, %bx                   # i*256+j (row major).
 
                 mov     OutSeg, %cx              # Point at input segment.
-                mov     %cx, es
-                mov     es:DataOut[bx], %al      # Get DataIn[i][j].
+                mov     %cx, %es
+                //mov     es:DataOut[bx], %al      # Get DataIn[i][j].
+                mov     DataOut(, %ebx, 1), %al
 
                 mov     InSeg, %cx               # Point at output segment.
-                mov     %cx, es
-                mov     %al, es:DataIn[bx]       # Store into DataOut[i][j]
+                mov     %cx, %es
+                //mov     %al, es:DataIn[bx]       # Store into DataOut[i][j]
+                mov     %al, DataOut(, %ebx, 1)
 
                 mov     j, %bx
                 inc     %bx                      # Next iteration of j loop.
@@ -316,7 +327,8 @@ GoodWrite:      mov     $0x3e, %ah         #Close operation.
                 int     $0x21
 
 
-#Quit:           ExitPgm                 #DOS macro to quit program.
+Quit:           //ExitPgm                 #DOS macro to quit program.
+                call exit
 #							#To be replaced with the proper syscall
 #Main            endp
 #
