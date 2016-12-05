@@ -105,12 +105,15 @@ GoodRead:       mov     dseg, %ax
 
 # Copy the input data to the output buffer.
 
-                mov     $0, i
-iloop0:         cmp     i, $250
-                ja      iDone0
-                mov     j, $0
-jloop0:         cmp     j, $255
-                ja      jDone0
+iloop0:         mov     $0, %bx
+                mov     i, %bx
+                cmp     $250, %bx
+                jb      iDone0
+                mov     $0, %bx
+                mov     %bx, j
+jloop0:         mov     j, %bx
+                cmp     $255, %bx
+                jb      jDone0
 
                 mov     i, %bx                   #Compute index into both
                 shl     $8, %bx                   # arrays using the formula
@@ -118,23 +121,32 @@ jloop0:         cmp     j, $255
 
                 mov     InSeg, %cx               #Point at input segment.
                 mov     %cx, es
-                mov     es:DataIn[bx], %al       #Get DataIn[i][j].
+                mov     es:DataIn[%bx], %al       #Get DataIn[i][j].
 
                 mov     OutSeg, %cx              #Point at output segment.
                 mov     %cx, es
-                mov     %al, es:DataOut[bx]      #Store into DataOut[i][j]
+                mov     %al, es:DataOut[%bx]      #Store into DataOut[i][j]
 
-                inc     j                       #Next iteration of j loop.
+                push    %ax
+                mov     j, %ax
+                inc     %ax                       #Next iteration of j loop.
+                mov     %ax, j
+                pop     %ax
                 jmp     jloop0
 
-jDone0:         inc     i                       #Next iteration of i loop.
+jDone0:         push    %ax
+                mov     i, %ax
+                inc     %ax                       #Next iteration of i loop.
+                mov     %ax, i
+                pop     %ax
                 jmp     iloop0
 
 iDone0:
 
 # for h := 1 to iterations-
 
-                mov     $1, h
+                mov     $1, %ax
+                mov     %ax, h
 hloop:          mov     h, %ax
                 cmp     iterations, %ax
                 ja      hloopDone
@@ -143,13 +155,17 @@ hloop:          mov     h, %ax
 
 # for i := 1 to 249 -
 
-                mov     $1, i
-iloop:          cmp     $249, i
+                mov     $1, %bx
+                mov     %bx, i
+iloop:          mov     i, %bx
+                cmp     $249, %bx
                 ja      iloopDone
 
 # for j := 1 to 254 -
-                mov     $1, j
-jloop:          cmp     $254, j
+                mov     $1, %bx
+                mov     %bx, j
+jloop:          mov     j, %bx
+                cmp     $254, %bx
                 ja      jloopDone
 
 
@@ -159,13 +175,18 @@ jloop:          cmp     $254, j
                 mov     InSeg, %ax               #Gain access to InSeg.
                 mov     %ax, es
 
-                mov     $0, sum
-                mov     -1, k
-kloop:          cmp     1, k
+                mov     $0, %bx
+                mov     %bx, sum
+                mov     $-1, %bx
+                mov     %bx, k
+kloop:          mov     k, %bx
+                cmp     %bx, k
                 jg      kloopDone
 
-                mov     -1, l
-lloop:          cmp     1, l
+                mov     $-1, %bx
+                mov     %bx, l
+lloop:          mov     k, %bx
+                cmp     %bx, l
                 jg      lloopDone
 
 # sum := sum + datain [i+k][j+l]
@@ -176,14 +197,18 @@ lloop:          cmp     1, l
                 add     j, %bx
                 add     l, %bx
 
-                mov     es:DataIn[bx], %al
+                mov     es:DataIn[%bx], %al
                 mov     $0, %ah
                 add     %ax, Sum
 
-                inc     l
+                mov     l, %bx
+                inc     %bx
+                mov     %bx, l
                 jmp     lloop
 
-lloopDone:      inc     k
+lloopDone:      mov     k, %bx
+                inc     %bx
+                mov     %bx, k
                 jmp     kloop
 
 
@@ -206,24 +231,32 @@ kloopDone:      mov     i, %bx
                 add     j, %bx
                 mov     %al, es:DataOut[bx]
 
-                inc     j
+                mov     j, %bx
+                inc     %bx
+                mov     %bx, j
                 jmp     jloop
 
-jloopDone:              inc     i
+jloopDone:      mov     i, %bx
+                inc     %bx
+                mov     %bx, i
                 jmp     iloop
 
 iloopDone:
 # Copy the output data to the input buffer.
 
-                mov     $0, i
-iloop1:         cmp     $250, i
+                mov     $0, %bx
+                mov     %bx, i
+iloop1:         mov     i, %bx
+                cmp     $250, %bx
                 ja      iDone1
-                mov     j, 0
-jloop1:         cmp     j, 255
-                ja      jDone1
+                mov     $0, %bx
+                mov     %bx, j
+jloop1:         mov     j, %bx
+                cmp     $255, %bx
+                jb      jDone1
 
                 mov     i, %bx                   # Compute index into both
-                shl     %bx, $8                  # arrays using the formula
+                shl     $8, %bx                  # arrays using the formula
                 add     j, %bx                   # i*256+j (row major).
 
                 mov     OutSeg, %cx              # Point at input segment.
@@ -234,13 +267,19 @@ jloop1:         cmp     j, 255
                 mov     %cx, es
                 mov     %al, es:DataIn[bx]       # Store into DataOut[i][j]
 
-                inc     j                        # Next iteration of j loop.
+                mov     j, %bx
+                inc     %bx                      # Next iteration of j loop.
+                mov     %bx, j
                 jmp     jloop1
 
-jDone1:         inc     i                       # Next iteration of i loop.
+jDone1:         mov     i, %bx
+                inc     %bx                     # Next iteration of i loop.
+                mov     %bx, i
                 jmp     iloop1
 
-iDone1:         inc     h
+iDone1:         mov     h, %bx
+                inc     %bx
+                mov     %bx, h
                 jmp     hloop
 
 hloopDone:      push    WriteResultsMsg
@@ -249,10 +288,10 @@ hloopDone:      push    WriteResultsMsg
 
 # Okay, write the data to the output file:
 
-                mov     0x3c, %ah         #Create output file.
-                mov     0, %cx              #Normal file attributes.
+                mov     $0x3c, %ah         #Create output file.
+                mov     $0, %cx              #Normal file attributes.
                 lea     OutName, %dx
-                int     0x21
+                int     $0x21
                 jnc     GoodCreate
                 push    CouldntCreateOutFileMsg
                 call    puts
@@ -263,18 +302,18 @@ GoodCreate:     mov     %ax, %bx          #File handle.
                 mov     OutSeg, %dx      #Where the data can be found.
                 mov     %dx, %ds
                 lea     DataOut, %dx
-                mov     256*251, %cx     #Size of data file to write.
-                mov     0x40, %ah         #Write operation.
-                int     0x21
+                mov     $256*251, %cx     #Size of data file to write.
+                mov     $0x40, %ah         #Write operation.
+                int     $0x21
                 pop     %bx              #Retrieve handle for close.
-                cmp     256*251, %ax     #See if we wrote the data.
+                cmp     $256*251, %ax     #See if we wrote the data.
                 je      GoodWrite
                 push    BadWriteMsg
                 call    puts
                 jmp     Quit
 
-GoodWrite:      mov     0x3e, %ah         #Close operation.
-                int     0x21
+GoodWrite:      mov     $0x3e, %ah         #Close operation.
+                int     $0x21
 
 
 #Quit:           ExitPgm                 #DOS macro to quit program.
