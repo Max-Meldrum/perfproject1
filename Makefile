@@ -6,11 +6,11 @@ all: imagefilter_s imagefilter_p imagefilter_c
 clean:
 	rm -f imagefilter_s imagefilter_p imagefilter_c
 
-imagefilter_s:
-	gcc -g -m32 imagefilter.s -o imagefilter_s
+imagefilter_s: imagefilter.s
+	gcc -g -m32 $< -o $@
 
-imagefilter_p:
-	fpc imagefilter.pas -oimagefilter_p
+imagefilter_p: imagefilter.pas
+	fpc $< -o$@
 
-imagefilter_c:
-	gcc imagefilter.c -o imagefilter_c -std=c99
+imagefilter_c: imagefilter.c
+	gcc $< -o $@ -std=c99
