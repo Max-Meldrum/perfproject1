@@ -1,6 +1,5 @@
 # imagefilter.s
 #
-#
 # An image processing program.
 #
 # This program blurs an eight-bit grayscale image by averaging a pixel
@@ -10,18 +9,7 @@
 # Because of the size of the image (almost 64K), the input and output
 # matrices are in different segments.
 #
-# Version #1: Straight-forward translation from Pascal to Assembly.
-#
-#       Performance comparisons (66 MHz 80486 DX/2 system).
-#
-#       This code-                              36 seconds.
-#       Borland Pascal v7.0-                    45 seconds.
-#       Borland C++ v4.02-                      29 seconds.
-#       Microsoft C++ v8.00-                    21 seconds.
-#                .xlist
-#                include         stdlib.a
-#                includelib      stdlib.lib
-#                .list 286
+
 
 .data
 
@@ -38,6 +26,18 @@ iterations:      .word
 InSeg:           .word
 OutSeg:          .word
 
+# File descriptors
+.lcomm fd_in 1
+.lcomm fd_out 1
+
+# In and out arrays
+DataIn:         .space 251*256
+DataOut:        .space    251*256 # 251*256
+
+# Read only data and code section
+.text
+
+# Puts strings
 CantOpenFileMsg:    .asciz    "Could not open input file."
 CantReadFileMsg:    .asciz    "Did not read the file properly"
 EnterNumberMsg:     .asciz    "Enter number of iterations: "
@@ -46,35 +46,18 @@ WriteResultsMsg:    .asciz    "Writing result"
 CouldntCreateOutFileMsg:.asciz    "Could not create output file."
 BadWriteMsg:        .asciz    "Did not write the file properly"
 
+# Formats
 ScanfDigitInput:    .asciz "%d"
 
 # File names:
-
 InName:          .asciz    "roller1.raw"
 OutName:         .asciz    "roller2.raw"
 
-# Here is the input data that we operate on.
-.bss
-
-// For file reading??
-.lcomm fd_in 1
-.lcomm fd_out 1
-
-#DataIn:          .byte    251 dup (256 dup (?))
-DataIn:         .space 251*256 # 251*256
-
-
-# Here is the output array that holds the result.
-
-#DataOut         byte    251 dup (256 dup (?))
-DataOut:        .space    251*256 # 251*256
 
 # Code
-.text
-
 .global main
 main:
-                // Open file for reading
+                # Open file for reading
                 mov     $5, %eax
                 mov     $InName, %ebx
                 mov     $0, %ecx
@@ -152,12 +135,12 @@ jloop0:         mov     j, %bx
 
                 mov     InSeg, %cx               #Point at input segment.
                 mov     %cx, %es
-                //mov   %es:DataIn[%bx], %al       #Get DataIn[i][j].
+                #mov   %es:DataIn[%bx], %al       #Get DataIn[i][j].
                 mov     DataIn(, %ebx, 1), %al
 
                 mov     OutSeg, %cx              #Point at output segment.
                 mov     %cx, %es
-                //mov     %al, es:DataOut[%bx]      #Store into DataOut[i][j]
+                #mov     %al, es:DataOut[%bx]      #Store into DataOut[i][j]
                 mov     %al, DataOut(, %ebx, 1)
 
                 push    %ax
@@ -229,7 +212,7 @@ lloop:          mov     k, %bx
                 add     j, %bx
                 add     l, %bx
 
-                //mov     es:DataIn[%bx], %al
+                #mov     es:DataIn[%bx], %al
                 mov     DataIn(, %ebx, 1), %al
                 mov     $0, %ah
                 add     %ax, sum
@@ -250,7 +233,7 @@ lloopDone:      mov     k, %bx
 kloopDone:      mov     i, %bx
                 shl     $8, %bx                   #*256
                 add     j, %bx
-                //mov     es:DataIn[bx], %al
+                #mov     es:DataIn[bx], %al
                 mov     DataIn(, %ebx, 1), %al
                 mov     $0, %ah
                 imul    $7, %ax
@@ -263,7 +246,7 @@ kloopDone:      mov     i, %bx
                 mov     i, %bx
                 shl     $8, %bx
                 add     j, %bx
-                //mov     %al, es:DataOut[bx]
+                #mov     %al, es:DataOut[bx]
                 mov     %al, DataOut(, %ebx, 1)
 
                 mov     j, %bx
@@ -296,12 +279,12 @@ jloop1:         mov     j, %bx
 
                 mov     OutSeg, %cx              # Point at input segment.
                 mov     %cx, %es
-                //mov     es:DataOut[bx], %al      # Get DataIn[i][j].
+                #mov     es:DataOut[bx], %al      # Get DataIn[i][j].
                 mov     DataOut(, %ebx, 1), %al
 
                 mov     InSeg, %cx               # Point at output segment.
                 mov     %cx, %es
-                //mov     %al, es:DataIn[bx]       # Store into DataOut[i][j]
+                #mov     %al, es:DataIn[bx]       # Store into DataOut[i][j]
                 mov     %al, DataOut(, %ebx, 1)
 
                 mov     j, %bx
@@ -319,15 +302,6 @@ iDone1:         mov     h, %bx
                 mov     %bx, h
                 jmp     hloop
 
-
-                // Create file for writing
-                /*
-                */
-                // Open file for writing
-                /*
-                */
-
-
 hloopDone:
                 mov     $WriteResultsMsg, %eax
                 subl    $16, %esp
@@ -335,7 +309,7 @@ hloopDone:
                 call    puts
                 addl    $16, %esp
 
-                // Create and open file for writing
+                # Create and open file for writing
                 mov     $8, %eax
                 mov     $OutName, %ebx
                 mov     $0666, %ecx        #read, write and execute by all
@@ -351,7 +325,7 @@ hloopDone:
                 addl    $16, %esp
                 jmp     Quit
 
-GoodCreate:     // Write to file
+GoodCreate:     # Write to file
                 mov     $251*256, %edx
                 mov     $DataOut, %ecx
                 mov     fd_out, %ebx
@@ -374,7 +348,7 @@ GoodWrite:
                 mov fd_out, %ebx
 
 
-Quit:           //ExitPgm                 #DOS macro to quit program.
+Quit:           #ExitPgm                 #DOS macro to quit program.
                 call exit
 #							#To be replaced with the proper syscall
 #Main            endp
