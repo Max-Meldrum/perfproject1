@@ -1,18 +1,16 @@
 
 .PHONY: all
-all: c pas # asm
+all: imagefilter_s imagefilter_p imagefilter_c
 
+.PHONY: clean
 clean:
 	rm -f imagefilter_s imagefilter_p imagefilter_c
 
-.PHONY: asm
-asm:
+imagefilter_s:
 	gcc -g -m32 imagefilter.s -o imagefilter_s
 
-.PHONY: pas
-pas:
+imagefilter_p:
 	fpc imagefilter.pas -oimagefilter_p
 
-.PHONY: c
-c:
+imagefilter_c:
 	gcc imagefilter.c -o imagefilter_c -std=c99
