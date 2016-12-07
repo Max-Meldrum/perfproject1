@@ -1,5 +1,6 @@
 # imagefilter.s
 #
+#
 # An image processing program.
 #
 # This program blurs an eight-bit grayscale image by averaging a pixel
@@ -36,8 +37,6 @@ iterations:      .word
 
 InSeg:           .word
 OutSeg:          .word
-
-
 
 CantOpenFileMsg:    .asciz    "Could not open input file."
 CantReadFileMsg:    .asciz    "Did not read the file properly"
@@ -93,7 +92,7 @@ BadOpen:        mov     $CantOpenFileMsg, %eax
                 addl    $16, %esp
                 jmp     Quit
 
-GoodOpen:       
+GoodOpen:
                 mov     $3, %eax
                 mov     fd_in, %ebx
                 mov     $InSeg, %ecx
@@ -122,12 +121,13 @@ GoodClose:      # Print "iterations:" question
                 addl    $16, %esp
                 # Get input
                 mov     $ScanfDigitInput, %eax
+                mov     $iterations, %ebx
                 subl    $16, %esp
+                push    %ebx
                 push    %eax
                 call    scanf
                 addl    $16, %esp
-                mov     %eax, iterations
-                # Print compute msg 
+                # Print compute msg
                 mov     $ComputeResultsMsg, %eax
                 subl    $16, %esp
                 push    %eax
@@ -174,7 +174,7 @@ jDone0:         push    %ax
                 pop     %ax
                 jmp     iloop0
 iDone0:
-/*
+
 # for h := 1 to iterations-
 
                 mov     $1, %ax
@@ -318,7 +318,6 @@ iDone1:         mov     h, %bx
                 inc     %bx
                 mov     %bx, h
                 jmp     hloop
-*/
 
 
                 // Create file for writing
@@ -342,7 +341,7 @@ hloopDone:
                 mov     $0666, %ecx        #read, write and execute by all
                 int     $0x80             #call kernel
 	            mov     %eax, fd_out
-                
+
                 cmp     $-1, %eax
                 jg      GoodCreate
                 mov     $CouldntCreateOutFileMsg, %eax
@@ -358,10 +357,10 @@ GoodCreate:     // Write to file
                 mov     fd_out, %ebx
                 mov     $4, %eax
                 int     $0x80
-                
+
                 cmp     $251*256, %eax
                 je      GoodWrite
-                
+
                 mov     $BadWriteMsg, %eax
                 subl    $16, %esp
                 push    %eax
@@ -369,7 +368,7 @@ GoodCreate:     // Write to file
                 addl    $16, %esp
                 jmp     Quit
 
-GoodWrite:      
+GoodWrite:
                 # close the file
                 mov $6, %eax
                 mov fd_out, %ebx
