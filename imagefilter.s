@@ -12,24 +12,27 @@
 
 
 .data
-
+# We put it here cause we don't know
+DataIn:         .space 251*256
+DataOut:        .space 251*256
 # Loop control variables and other variables:
 
-h:               .word
-i:               .word
-j:               .word
-k:               .word
-l:               .word
-sum:             .word
-iterations:      .word
+h:               .quad
+i:               .quad
+test:           .space 1000
+j:               .quad
+k:               .quad
+l:               .quad
+sum:             .quad
+iterations:      .quad
 
 # File descriptors
 .lcomm fd_in 1
 .lcomm fd_out 1
 
 # In and out arrays
-DataIn:         .space 251*256
-DataOut:        .space 251*256
+#DataIn:         .space 251*256
+#DataOut:        .space 251*256
 
 # Read only data and code section
 .text
@@ -113,48 +116,46 @@ GoodClose:      # Print "iterations:" question
                 push    %eax
                 call    puts
                 addl    $16, %esp
-/*
 # Copy the input data to the output buffer.
 
-iloop0:         mov     $0, %bx
-                mov     i, %bx
-                cmp     $250, %bx
-                jb      iDone0
-                mov     $0, %bx
-                mov     %bx, j
-jloop0:         mov     j, %bx
-                cmp     $255, %bx
-                jb      jDone0
+                mov     $0, %ebx
+                mov     %ebx, i
 
-                mov     i, %bx                   #Compute index into both
-                shl     $8, %bx                   # arrays using the formula
-                add     j, %bx                   # i*256+j (row major).
+iloop0:         mov     i, %ebx
+                cmp     $250, %ebx
+                jg      iDone0
 
-                mov     $DataIn, %ecx               #Point at input segment.
-                mov     %cx, %es
-                #mov   %es:DataIn[%bx], %al       #Get DataIn[i][j].
-                mov     DataIn(, %ebx, 1), %al
+                mov     $0, %ebx
+                mov     %ebx, j
+jloop0:         mov     j, %ebx
+                cmp     $255, %ebx
+                jg      jDone0
 
-                mov     $DataOut, %ecx              #Point at output segment.
-                mov     %cx, %es
-                #mov     %al, es:DataOut[%bx]      #Store into DataOut[i][j]
-                mov     %al, DataOut(, %ebx, 1)
+                mov     i, %ebx                   #Compute index into both
+                shl     $8, %ebx                   # arrays using the formula
+                add     j, %ebx                   # i*256+j (row major).
 
-                push    %ax
-                mov     j, %ax
-                inc     %ax                       #Next iteration of j loop.
-                mov     %ax, j
-                pop     %ax
+                mov     $DataIn, %ecx
+                add     %ebx, %ecx
+                mov     (%ecx), %al
+
+
+                mov     $DataOut, %ecx
+                add     %ebx, %ecx
+                mov     %al, (%ecx)
+
+                mov     j, %eax
+                inc     %eax                       #Next iteration of j loop.
+                mov     %eax, j
                 jmp     jloop0
 
-jDone0:         push    %ax
-                mov     i, %ax
-                inc     %ax                       #Next iteration of i loop.
-                mov     %ax, i
-                pop     %ax
+jDone0:         mov     i, %eax
+                inc     %eax                       #Next iteration of i loop.
+                mov     %eax, i
                 jmp     iloop0
 iDone0:
 
+/*
 # for h := 1 to iterations-
 
                 mov     $1, %ax
@@ -325,7 +326,7 @@ hloopDone:
 
 GoodCreate:     # Write to file
                 mov     $251*256, %edx
-                mov     $DataIn, %ecx
+                mov     $DataOut, %ecx
                 mov     fd_out, %ebx
                 mov     $4, %eax
                 int     $0x80
