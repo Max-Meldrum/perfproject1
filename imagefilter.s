@@ -23,16 +23,13 @@ l:               .word
 sum:             .word
 iterations:      .word
 
-InSeg:           .word
-OutSeg:          .word
-
 # File descriptors
 .lcomm fd_in 1
 .lcomm fd_out 1
 
 # In and out arrays
 DataIn:         .space 251*256
-DataOut:        .space    251*256 # 251*256
+DataOut:        .space 251*256
 
 # Read only data and code section
 .text
@@ -78,11 +75,11 @@ BadOpen:        mov     $CantOpenFileMsg, %eax
 GoodOpen:
                 mov     $3, %eax
                 mov     fd_in, %ebx
-                mov     $InSeg, %ecx
-                mov     $26, %edx
+                mov     $DataIn, %ecx
+                mov     $251*256, %edx
                 int     $0x80
 
-                cmp     $0, %ax             #See if we read the data
+                cmp     $0, %eax             #See if we read the data
 
                 jge     GoodRead
                 mov     $CantReadFileMsg, %eax
@@ -116,7 +113,7 @@ GoodClose:      # Print "iterations:" question
                 push    %eax
                 call    puts
                 addl    $16, %esp
-
+/*
 # Copy the input data to the output buffer.
 
 iloop0:         mov     $0, %bx
@@ -133,12 +130,12 @@ jloop0:         mov     j, %bx
                 shl     $8, %bx                   # arrays using the formula
                 add     j, %bx                   # i*256+j (row major).
 
-                mov     InSeg, %cx               #Point at input segment.
+                mov     $DataIn, %ecx               #Point at input segment.
                 mov     %cx, %es
                 #mov   %es:DataIn[%bx], %al       #Get DataIn[i][j].
                 mov     DataIn(, %ebx, 1), %al
 
-                mov     OutSeg, %cx              #Point at output segment.
+                mov     $DataOut, %ecx              #Point at output segment.
                 mov     %cx, %es
                 #mov     %al, es:DataOut[%bx]      #Store into DataOut[i][j]
                 mov     %al, DataOut(, %ebx, 1)
@@ -187,7 +184,7 @@ jloop:          mov     j, %bx
 # sum := 0#
 # for k := -1 to 1 do for l := -1 to 1 do
 
-                mov     InSeg, %ax               #Gain access to InSeg.
+                mov     $DataIn, %eax               #Gain access to InSeg.
                 mov     %ax, %es
 
                 mov     $0, %bx
@@ -240,7 +237,7 @@ kloopDone:      mov     i, %bx
                 add     sum, %ax
                 shr     $4, %ax                   #div 16
 
-                mov     OutSeg, %bx
+                mov     $DataOut, %ebx
                 mov     %bx, %es
 
                 mov     i, %bx
@@ -277,12 +274,12 @@ jloop1:         mov     j, %bx
                 shl     $8, %bx                  # arrays using the formula
                 add     j, %bx                   # i*256+j (row major).
 
-                mov     OutSeg, %cx              # Point at input segment.
+                mov     $DataOut, %ecx              # Point at input segment.
                 mov     %cx, %es
                 #mov     es:DataOut[bx], %al      # Get DataIn[i][j].
                 mov     DataOut(, %ebx, 1), %al
 
-                mov     InSeg, %cx               # Point at output segment.
+                mov     $DataIn, %ecx               # Point at output segment.
                 mov     %cx, %es
                 #mov     %al, es:DataIn[bx]       # Store into DataOut[i][j]
                 mov     %al, DataOut(, %ebx, 1)
@@ -301,6 +298,7 @@ iDone1:         mov     h, %bx
                 inc     %bx
                 mov     %bx, h
                 jmp     hloop
+*/
 
 hloopDone:
                 mov     $WriteResultsMsg, %eax
@@ -327,7 +325,7 @@ hloopDone:
 
 GoodCreate:     # Write to file
                 mov     $251*256, %edx
-                mov     $DataOut, %ecx
+                mov     $DataIn, %ecx
                 mov     fd_out, %ebx
                 mov     $4, %eax
                 int     $0x80
