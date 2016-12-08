@@ -269,12 +269,12 @@ iloopDone:
                 mov     %bx, i
 iloop1:         mov     i, %bx
                 cmp     $250, %bx
-                ja      iDone1
+                jg      iDone1
                 mov     $0, %bx
                 mov     %bx, j
 jloop1:         mov     j, %bx
                 cmp     $255, %bx
-                jb      jDone1
+                jg      jDone1
 
                 mov     i, %ebx                   # Compute index into both
                 shl     $8, %ebx                  # arrays using the formula
