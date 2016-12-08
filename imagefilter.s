@@ -18,12 +18,17 @@ DataOut:        .space 251*256
 # Loop control variables and other variables:
 
 h:               .quad
+test1:           .space 1000
 i:               .quad
-test:           .space 1000
+test2:           .space 1000
 j:               .quad
+test3:           .space 1000
 k:               .quad
+test4:           .space 1000
 l:               .quad
+test5:           .space 1000
 sum:             .quad
+test6:           .space 1000
 iterations:      .quad
 
 # File descriptors
@@ -155,14 +160,13 @@ jDone0:         mov     i, %eax
                 jmp     iloop0
 iDone0:
 
-/*
 # for h := 1 to iterations-
 
                 mov     $1, %ax
                 mov     %ax, h
 hloop:          mov     h, %ax
                 cmp     iterations, %ax
-                ja      hloopDone
+                jg      hloopDone
 
 
 
@@ -185,21 +189,18 @@ jloop:          mov     j, %bx
 # sum := 0#
 # for k := -1 to 1 do for l := -1 to 1 do
 
-                mov     $DataIn, %eax               #Gain access to InSeg.
-                mov     %ax, %es
-
                 mov     $0, %bx
                 mov     %bx, sum
                 mov     $-1, %bx
                 mov     %bx, k
 kloop:          mov     k, %bx
-                cmp     %bx, k
+                cmp     $1, %bx
                 jg      kloopDone
 
                 mov     $-1, %bx
                 mov     %bx, l
 lloop:          mov     k, %bx
-                cmp     %bx, l
+                cmp     $1, %bx
                 jg      lloopDone
 
 # sum := sum + datain [i+k][j+l]
@@ -210,8 +211,10 @@ lloop:          mov     k, %bx
                 add     j, %bx
                 add     l, %bx
 
-                #mov     es:DataIn[%bx], %al
-                mov     DataIn(, %ebx, 1), %al
+                mov     $DataIn, %ecx
+                add     %ebx, %ecx
+                mov     (%ecx), %al
+
                 mov     $0, %ah
                 add     %ax, sum
 
@@ -231,21 +234,23 @@ lloopDone:      mov     k, %bx
 kloopDone:      mov     i, %bx
                 shl     $8, %bx                   #*256
                 add     j, %bx
-                #mov     es:DataIn[bx], %al
-                mov     DataIn(, %ebx, 1), %al
+
+                mov     $DataIn, %ecx
+                add     %ebx, %ecx
+                mov     (%ecx), %al
+
                 mov     $0, %ah
                 imul    $7, %ax
                 add     sum, %ax
                 shr     $4, %ax                   #div 16
 
-                mov     $DataOut, %ebx
-                mov     %bx, %es
-
                 mov     i, %bx
                 shl     $8, %bx
                 add     j, %bx
-                #mov     %al, es:DataOut[bx]
-                mov     %al, DataOut(, %ebx, 1)
+
+                mov     $DataOut, %ecx
+                add     %ebx, %ecx
+                mov     %al, (%ecx)
 
                 mov     j, %bx
                 inc     %bx
@@ -275,15 +280,10 @@ jloop1:         mov     j, %bx
                 shl     $8, %bx                  # arrays using the formula
                 add     j, %bx                   # i*256+j (row major).
 
-                mov     $DataOut, %ecx              # Point at input segment.
-                mov     %cx, %es
-                #mov     es:DataOut[bx], %al      # Get DataIn[i][j].
-                mov     DataOut(, %ebx, 1), %al
-
-                mov     $DataIn, %ecx               # Point at output segment.
-                mov     %cx, %es
-                #mov     %al, es:DataIn[bx]       # Store into DataOut[i][j]
-                mov     %al, DataOut(, %ebx, 1)
+                # Rewrite this
+                mov     $DataIn, %ecx
+                add     %ebx, %ecx
+                mov     (%ecx), %al
 
                 mov     j, %bx
                 inc     %bx                      # Next iteration of j loop.
@@ -299,7 +299,6 @@ iDone1:         mov     h, %bx
                 inc     %bx
                 mov     %bx, h
                 jmp     hloop
-*/
 
 hloopDone:
                 mov     $WriteResultsMsg, %eax
