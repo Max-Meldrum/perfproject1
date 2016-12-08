@@ -183,7 +183,7 @@ iloop:          mov     i, %bx
                 mov     %bx, j
 jloop:          mov     j, %bx
                 cmp     $254, %bx
-                ja      jloopDone
+                jg      jloopDone
 
 
 # sum := 0#
@@ -199,7 +199,7 @@ kloop:          mov     k, %bx
 
                 mov     $-1, %bx
                 mov     %bx, l
-lloop:          mov     k, %bx
+lloop:          mov     l, %bx
                 cmp     $1, %bx
                 jg      lloopDone
 
@@ -276,14 +276,17 @@ jloop1:         mov     j, %bx
                 cmp     $255, %bx
                 jb      jDone1
 
-                mov     i, %bx                   # Compute index into both
-                shl     $8, %bx                  # arrays using the formula
-                add     j, %bx                   # i*256+j (row major).
+                mov     i, %ebx                   # Compute index into both
+                shl     $8, %ebx                  # arrays using the formula
+                add     j, %ebx                   # i*256+j (row major).
 
-                # Rewrite this
-                mov     $DataIn, %ecx
+                mov     $DataOut, %ecx
                 add     %ebx, %ecx
                 mov     (%ecx), %al
+
+                mov     $DataIn, %ecx
+                add     %ebx, %ecx
+                mov     %al, (%ecx)
 
                 mov     j, %bx
                 inc     %bx                      # Next iteration of j loop.
