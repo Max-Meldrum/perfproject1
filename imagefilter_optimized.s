@@ -155,28 +155,13 @@ jloop:          mov     j, %bx
 
 # sum := 0#
 # for k := -1 to 1 do for l := -1 to 1 do
-
-                mov     $0, %bx
-                mov     %bx, sum
-                mov     $-1, %bx
-                mov     %bx, k
-kloop:          mov     k, %bx
-                cmp     $1, %bx
-                jg      kloopDone
-
-                mov     $-1, %bx
-                mov     %bx, l
-lloop:          mov     l, %bx
-                cmp     $1, %bx
-                jg      lloopDone
-
 # sum := sum + datain [i+k][j+l]
-
+		# -1,-1
                 mov     i, %bx
-                add     k, %bx
+                add     $-1, %bx
                 shl     $8, %bx                 #Multiply by 256.
                 add     j, %bx
-                add     l, %bx
+                add     $-1, %bx
 
                 mov     $DataIn, %ecx
                 add     %ebx, %ecx
@@ -184,17 +169,118 @@ lloop:          mov     l, %bx
 
                 mov     $0, %ah
                 add     %ax, sum
+		
+		# -1,0
+                mov     i, %bx
+                add     $-1, %bx
+                shl     $8, %bx                 #Multiply by 256.
+                add     j, %bx
+                add     $0, %bx
 
-                mov     l, %bx
-                inc     %bx
-                mov     %bx, l
-                jmp     lloop
+                mov     $DataIn, %ecx
+                add     %ebx, %ecx
+                mov     (%ecx), %al
 
-lloopDone:      mov     k, %bx
-                inc     %bx
-                mov     %bx, k
-                jmp     kloop
+                mov     $0, %ah
+                add     %ax, sum
+		
+		# -1,1
+                mov     i, %bx
+                add     $-1, %bx
+                shl     $8, %bx                 #Multiply by 256.
+                add     j, %bx
+                add     $1, %bx
 
+                mov     $DataIn, %ecx
+                add     %ebx, %ecx
+                mov     (%ecx), %al
+
+                mov     $0, %ah
+                add     %ax, sum
+		
+		# 0,-1
+                mov     i, %bx
+                add     $0, %bx
+                shl     $8, %bx                 #Multiply by 256.
+                add     j, %bx
+                add     $-1, %bx
+
+                mov     $DataIn, %ecx
+                add     %ebx, %ecx
+                mov     (%ecx), %al
+
+                mov     $0, %ah
+                add     %ax, sum
+		
+		# 0,0
+                mov     i, %bx
+                add     $0, %bx
+                shl     $8, %bx                 #Multiply by 256.
+                add     j, %bx
+                add     $0, %bx
+
+                mov     $DataIn, %ecx
+                add     %ebx, %ecx
+                mov     (%ecx), %al
+
+                mov     $0, %ah
+                add     %ax, sum
+		
+		# 0,1
+                mov     i, %bx
+                add     $0, %bx
+                shl     $8, %bx                 #Multiply by 256.
+                add     j, %bx
+                add     $1, %bx
+
+                mov     $DataIn, %ecx
+                add     %ebx, %ecx
+                mov     (%ecx), %al
+
+                mov     $0, %ah
+                add     %ax, sum
+		
+		# 1,-1
+                mov     i, %bx
+                add     $1, %bx
+                shl     $8, %bx                 #Multiply by 256.
+                add     j, %bx
+                add     $-1, %bx
+
+                mov     $DataIn, %ecx
+                add     %ebx, %ecx
+                mov     (%ecx), %al
+
+                mov     $0, %ah
+                add     %ax, sum
+		
+		# 1,0
+                mov     i, %bx
+                add     $1, %bx
+                shl     $8, %bx                 #Multiply by 256.
+                add     j, %bx
+                add     $0, %bx
+
+                mov     $DataIn, %ecx
+                add     %ebx, %ecx
+                mov     (%ecx), %al
+
+                mov     $0, %ah
+                add     %ax, sum
+		
+		# 1,1
+                mov     i, %bx
+                add     $1, %bx
+                shl     $8, %bx                 #Multiply by 256.
+                add     j, %bx
+                add     $1, %bx
+
+                mov     $DataIn, %ecx
+                add     %ebx, %ecx
+                mov     (%ecx), %al
+
+                mov     $0, %ah
+                add     %ax, sum
 
 # dataout [i][j] := (sum + datain[i][j]*7) div 16#
 
