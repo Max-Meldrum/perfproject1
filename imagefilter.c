@@ -35,6 +35,7 @@ int main(int argc, char* argv){
                 out[x][y] = (( sum + in[x][y]*7 ) / 16 ) % 255;
             }
         }
+        memcpy(in, out, sizeof(out));
     }
 
     fwrite(out, W*H, sizeof(char), fout);

@@ -4,7 +4,7 @@ all: imagefilter_s imagefilter_p imagefilter_c imagefilter_o
 
 .PHONY: clean
 clean:
-	rm -f imagefilter_s imagefilter_p imagefilter_c
+	rm -f imagefilter_s imagefilter_p imagefilter_c imagefilter_o
 
 imagefilter_s: imagefilter.s
 	gcc -g -m32 $< -o $@
