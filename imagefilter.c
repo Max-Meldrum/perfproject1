@@ -1,11 +1,10 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <stdio.h>  // Used by printf, scanf, fread, fwrite, fopen
+#include <string.h> // Used by memcpy
 
-#define W 251
-#define H 256
+#define W 251 // Image width
+#define H 256 // Image height
 
-int main(int argc, char* argv){
+int main(int argc, char* argv){ // Main start function
     FILE* fin = fopen("roller1.raw", "r");  // Open file descriptor for input file
     FILE* fout = fopen("roller2.raw", "w"); // Open file descriptor for output file
 
@@ -38,5 +37,5 @@ int main(int argc, char* argv){
     }
     fwrite(out, W*H, sizeof(char), fout); // Write out array to out file
 
-    return 0;
+    return 0; // Exit gracefully
 }
