@@ -16,4 +16,4 @@ imagefilter_p: imagefilter.pas
 	fpc $< -o$@
 
 imagefilter_c: imagefilter.c
-	gcc -g $< -O3 -o $@ -std=c99
+	gcc -g $<  -o $@ -std=c99
