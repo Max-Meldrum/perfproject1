@@ -134,11 +134,7 @@ copyshit:
 		mov	$0, %ebx # Since we later will only use %bx, clear high 32-bit part of the register 
         mov     $1, %ax
         mov     %ax, h        
-hloop:  mov     h, %ax
-        cmp     iterations, %ax
-        jg      hloopDone
-                
-
+hloop:  
 
 # for i := 1 to 249 -
 
@@ -361,7 +357,7 @@ iDone1:         mov     h, %bx
                 inc     %bx
                 mov     %bx, h
 		
-		mov     h, %ax
+		        mov     h, %ax
                 cmp     iterations, %ax
                 jle      hloop
 
