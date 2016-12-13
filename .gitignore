@@ -1,4 +1,6 @@
 *.o
+roller2.raw*
 imagefilter_c
 imagefilter_s
 imagefilter_p
+imagefilter_o

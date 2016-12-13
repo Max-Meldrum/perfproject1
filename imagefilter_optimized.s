@@ -124,17 +124,17 @@ GoodClose:      # Print "iterations:" question
 # Copy the input data to the output buffer.
 
 copyshit:
-		mov	$DataIn, %esi
-		mov	$DataOut, %edi
-		mov	$251*64, %ecx  # 251*(256/4)(movsd moves 4 bytes per iteration)
-		rep	movsd
+                mov     $DataIn, %esi
+                mov     $DataOut, %edi
+                mov     $251*64, %ecx  # 251*(256/4)(movsd moves 4 bytes per iteration)
+                rep     movsd
 
-# for h := 1 to iterations-
+                # for h := 1 to iterations-
 
-		mov	$0, %ebx # Since we later will only use %bx, clear high 32-bit part of the register 
-        mov     $1, %ax
-        mov     %ax, h        
-hloop:  
+                mov     $0, %ebx # Since we later will only use %bx, clear high 32-bit part of the register
+                mov     $1, %ax
+                mov     %ax, h
+hloop:
 
 # for i := 1 to 249 -
 
@@ -170,7 +170,7 @@ jloop:          mov     j, %bx
 
                 mov     $0, %ah
                 add     %ax, sum
-		
+
 		# -1,0
                 mov     i, %bx
                 add     $-1, %bx
@@ -184,7 +184,7 @@ jloop:          mov     j, %bx
 
                 mov     $0, %ah
                 add     %ax, sum
-		
+
 		# -1,1
                 mov     i, %bx
                 add     $-1, %bx
@@ -198,7 +198,7 @@ jloop:          mov     j, %bx
 
                 mov     $0, %ah
                 add     %ax, sum
-		
+
 		# 0,-1
                 mov     i, %bx
                 add     $0, %bx
@@ -212,7 +212,7 @@ jloop:          mov     j, %bx
 
                 mov     $0, %ah
                 add     %ax, sum
-		
+
 		# 0,0
                 mov     i, %bx
                 add     $0, %bx
@@ -226,7 +226,7 @@ jloop:          mov     j, %bx
 
                 mov     $0, %ah
                 add     %ax, sum
-		
+
 		# 0,1
                 mov     i, %bx
                 add     $0, %bx
@@ -240,7 +240,7 @@ jloop:          mov     j, %bx
 
                 mov     $0, %ah
                 add     %ax, sum
-		
+
 		# 1,-1
                 mov     i, %bx
                 add     $1, %bx
@@ -254,7 +254,7 @@ jloop:          mov     j, %bx
 
                 mov     $0, %ah
                 add     %ax, sum
-		
+
 		# 1,0
                 mov     i, %bx
                 add     $1, %bx
@@ -268,7 +268,7 @@ jloop:          mov     j, %bx
 
                 mov     $0, %ah
                 add     %ax, sum
-		
+
 		# 1,1
                 mov     i, %bx
                 add     $1, %bx
@@ -356,7 +356,7 @@ jDone1:         mov     i, %bx
 iDone1:         mov     h, %bx
                 inc     %bx
                 mov     %bx, h
-		
+
 		        mov     h, %ax
                 cmp     iterations, %ax
                 jle      hloop
