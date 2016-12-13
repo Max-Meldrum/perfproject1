@@ -32,7 +32,7 @@ int main(int argc, char* argv){
                     }
                 }
                 // bordering pixels have 50% weight and original pixel has 50% weight
-                out[x][y] = (( sum + in[x][y]*7 ) / 16 ) % 255;
+                out[x][y] = (( sum + in[x][y]*7 ) / 16 );
             }
         }
         memcpy(in, out, sizeof(out));
