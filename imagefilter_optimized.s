@@ -80,7 +80,7 @@ BadOpen:        mov     $CantOpenFileMsg, %eax
                 addl    $16, %esp
                 jmp     Quit
 
-GoodOpen:
+GoodOpen:       # Read data into DataIn
                 mov     $3, %eax
                 mov     fd_in, %ebx
                 mov     $DataIn, %ecx
@@ -121,46 +121,39 @@ GoodClose:      # Print "iterations:" question
                 push    %eax
                 call    puts
                 addl    $16, %esp
-# Copy the input data to the output buffer.
 
-copyshit:
+copy:           # Copy the input data to the output buffer.
                 mov     $DataIn, %esi
                 mov     $DataOut, %edi
                 mov     $251*64, %ecx  # 251*(256/4)(movsd moves 4 bytes per iteration)
                 rep     movsd
 
-                # for h := 1 to iterations-
 
                 mov     $0, %ebx # Since we later will only use %bx, clear high 32-bit part of the register
                 mov     $1, %ax
                 mov     %ax, h
-hloop:
-
-# for i := 1 to 249 -
-
+hloop:          # for h := iterationcount
                 mov     $1, %bx
                 mov     %bx, i
-iloop:          mov     i, %bx
+iloop:          # for i := 1 to 249
+                mov     i, %bx
                 cmp     $249, %bx
                 ja      iloopDone
 
-# for j := 1 to 254 -
                 mov     $1, %bx
                 mov     %bx, j
-jloop:          mov     j, %bx
+jloop:          # for j := 1 to 254 -
+                mov     j, %bx
                 cmp     $254, %bx
                 jg      jloopDone
 
-
-# sum := 0#
+                # sum := 0#
                 mov     $0, %bx
                 mov     %bx, sum
-# for k := -1 to 1 do for l := -1 to 1 do
-# sum := sum + datain [i+k][j+l]
 		# -1,-1
                 mov     i, %bx
                 add     $-1, %bx
-                shl     $8, %bx                 #Multiply by 256.
+                shl     $8, %bx
                 add     j, %bx
                 add     $-1, %bx
 
@@ -174,7 +167,7 @@ jloop:          mov     j, %bx
 		# -1,0
                 mov     i, %bx
                 add     $-1, %bx
-                shl     $8, %bx                 #Multiply by 256.
+                shl     $8, %bx
                 add     j, %bx
                 add     $0, %bx
 
@@ -188,7 +181,7 @@ jloop:          mov     j, %bx
 		# -1,1
                 mov     i, %bx
                 add     $-1, %bx
-                shl     $8, %bx                 #Multiply by 256.
+                shl     $8, %bx
                 add     j, %bx
                 add     $1, %bx
 
@@ -202,7 +195,7 @@ jloop:          mov     j, %bx
 		# 0,-1
                 mov     i, %bx
                 add     $0, %bx
-                shl     $8, %bx                 #Multiply by 256.
+                shl     $8, %bx
                 add     j, %bx
                 add     $-1, %bx
 
@@ -216,7 +209,7 @@ jloop:          mov     j, %bx
 		# 0,0
                 mov     i, %bx
                 add     $0, %bx
-                shl     $8, %bx                 #Multiply by 256.
+                shl     $8, %bx
                 add     j, %bx
                 add     $0, %bx
 
@@ -230,7 +223,7 @@ jloop:          mov     j, %bx
 		# 0,1
                 mov     i, %bx
                 add     $0, %bx
-                shl     $8, %bx                 #Multiply by 256.
+                shl     $8, %bx
                 add     j, %bx
                 add     $1, %bx
 
@@ -244,7 +237,7 @@ jloop:          mov     j, %bx
 		# 1,-1
                 mov     i, %bx
                 add     $1, %bx
-                shl     $8, %bx                 #Multiply by 256.
+                shl     $8, %bx
                 add     j, %bx
                 add     $-1, %bx
 
@@ -258,7 +251,7 @@ jloop:          mov     j, %bx
 		# 1,0
                 mov     i, %bx
                 add     $1, %bx
-                shl     $8, %bx                 #Multiply by 256.
+                shl     $8, %bx
                 add     j, %bx
                 add     $0, %bx
 
@@ -272,7 +265,7 @@ jloop:          mov     j, %bx
 		# 1,1
                 mov     i, %bx
                 add     $1, %bx
-                shl     $8, %bx                 #Multiply by 256.
+                shl     $8, %bx
                 add     j, %bx
                 add     $1, %bx
 
@@ -285,9 +278,9 @@ jloop:          mov     j, %bx
 
 
 # dataout [i][j] := (sum + datain[i][j]*7) div 16#
-
-kloopDone:      mov     i, %bx
-                shl     $8, %bx                   #*256
+kloopDone:      # Get pointer to element in DataIn
+                mov     i, %bx
+                shl     $8, %bx  #*256
                 add     j, %bx
 
                 mov     $DataIn, %ecx
@@ -297,14 +290,16 @@ kloopDone:      mov     i, %bx
                 mov     $0, %ah
                 imul    $7, %ax
                 add     sum, %ax
-                shr     $4, %ax                   #div 16
+                shr     $4, %ax  #div 16
 
                 mov     i, %bx
                 shl     $8, %bx
                 add     j, %bx
 
+                # Get pointer to DataOut
                 mov     $DataOut, %ecx
                 add     %ebx, %ecx
+                # Move result to DataOut
                 mov     %al, (%ecx)
 
                 mov     j, %bx
@@ -318,7 +313,7 @@ jloopDone:      mov     i, %bx
                 jmp     iloop
 
 iloopDone:
-# Copy the output data to the input buffer.
+                # Copy the output data to the input buffer.
                 mov     $DataOut, %esi
                 mov     $DataIn, %edi
                 mov     $251*64, %ecx  # 251*(256/4)(movsd moves 4 bytes per iteration)
@@ -328,11 +323,11 @@ iDone1:         mov     h, %bx
                 inc     %bx
                 mov     %bx, h
 
-		        mov     h, %ax
+                mov     h, %ax
                 cmp     iterations, %ax
                 jle      hloop
 
-hloopDone:
+hloopDone:      # Print "Writing results" message
                 mov     $WriteResultsMsg, %eax
                 subl    $16, %esp
                 push    %eax
@@ -346,6 +341,7 @@ hloopDone:
                 int     $0x80             #call kernel
 	            mov     %eax, fd_out
 
+                # Check that file was sucessfully opened
                 cmp     $-1, %eax
                 jg      GoodCreate
                 mov     $CouldntCreateOutFileMsg, %eax
@@ -362,6 +358,7 @@ GoodCreate:     # Write to file
                 mov     $4, %eax
                 int     $0x80
 
+                # Check that file was successfully written to
                 cmp     $251*256, %eax
                 je      GoodWrite
 
@@ -372,24 +369,13 @@ GoodCreate:     # Write to file
                 addl    $16, %esp
                 jmp     Quit
 
-GoodWrite:
-                # close the file
+GoodWrite:      # close the file
                 mov $6, %eax
                 mov fd_out, %ebx
 
 
-Quit:           #ExitPgm                 #DOS macro to quit program.
-                call exit
-#							#To be replaced with the proper syscall
-#Main            endp
-#
-#cseg            ends
-#
-#sseg            segment para stack 'stack'
-#stk             byte    1024 dup ("stack ")
-#sseg            ends
-#
-#zzzzzzseg       segment para public 'zzzzzz'
-#LastBytes       byte    16 dup (?)
-#zzzzzzseg       ends
-#                end     Main
+Quit:           # Exit program
+                mov     $0, %eax
+                subl    $16, %esp
+                push    %eax
+                call    exit
