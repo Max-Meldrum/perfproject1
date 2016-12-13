@@ -319,39 +319,10 @@ jloopDone:      mov     i, %bx
 
 iloopDone:
 # Copy the output data to the input buffer.
-
-                mov     $0, %bx
-                mov     %bx, i
-iloop1:         mov     i, %bx
-                cmp     $250, %bx
-                jg      iDone1
-                mov     $0, %bx
-                mov     %bx, j
-jloop1:         mov     j, %bx
-                cmp     $255, %bx
-                jg      jDone1
-
-                mov     i, %ebx                   # Compute index into both
-                shl     $8, %ebx                  # arrays using the formula
-                add     j, %ebx                   # i*256+j (row major).
-
-                mov     $DataOut, %ecx
-                add     %ebx, %ecx
-                mov     (%ecx), %al
-
-                mov     $DataIn, %ecx
-                add     %ebx, %ecx
-                mov     %al, (%ecx)
-
-                mov     j, %bx
-                inc     %bx                      # Next iteration of j loop.
-                mov     %bx, j
-                jmp     jloop1
-
-jDone1:         mov     i, %bx
-                inc     %bx                     # Next iteration of i loop.
-                mov     %bx, i
-                jmp     iloop1
+                mov     $DataOut, %esi
+                mov     $DataIn, %edi
+                mov     $251*64, %ecx  # 251*(256/4)(movsd moves 4 bytes per iteration)
+                rep     movsd
 
 iDone1:         mov     h, %bx
                 inc     %bx
