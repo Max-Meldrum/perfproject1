@@ -132,9 +132,12 @@ copyshit:
 # for h := 1 to iterations-
 
 		mov	$0, %ebx # Since we later will only use %bx, clear high 32-bit part of the register 
-                mov     $1, %ax
-                mov     %ax, h
-hloop:          
+        mov     $1, %ax
+        mov     %ax, h        
+hloop:  mov     h, %ax
+        cmp     iterations, %ax
+        jg      hloopDone
+                
 
 
 # for i := 1 to 249 -
@@ -154,6 +157,8 @@ jloop:          mov     j, %bx
 
 
 # sum := 0#
+                mov     $0, %bx
+                mov     %bx, sum
 # for k := -1 to 1 do for l := -1 to 1 do
 # sum := sum + datain [i+k][j+l]
 		# -1,-1
@@ -281,6 +286,7 @@ jloop:          mov     j, %bx
 
                 mov     $0, %ah
                 add     %ax, sum
+
 
 # dataout [i][j] := (sum + datain[i][j]*7) div 16#
 
