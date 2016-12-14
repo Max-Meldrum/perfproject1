@@ -12,11 +12,12 @@
 
 
 .data
-# We put it here cause we don't know
+# Data arrays
 DataIn:         .space 251*256
 DataOut:        .space 251*256
 # Loop control variables and other variables:
-
+# For some reason we need space between the variables
+# Otherwise different variables overwrite eachother for some reason
 h:               .quad
 test1:           .space 1000
 i:               .quad
@@ -73,7 +74,8 @@ main:
                 cmp     $0, %eax
                 jg      GoodOpen
 
-BadOpen:        mov     $CantOpenFileMsg, %eax
+BadOpen:        # Print error message in case of bad open
+                mov     $CantOpenFileMsg, %eax
                 subl    $16, %esp
                 push    %eax
                 call    puts
@@ -87,9 +89,10 @@ GoodOpen:       # Read data into DataIn
                 mov     $251*256, %edx
                 int     $0x80
 
-                cmp     $0, %eax             #See if we read the data
-
+                cmp     $0, %eax   #See if we read the data
                 jge     GoodRead
+
+                # Print error message in case of bad read
                 mov     $CantReadFileMsg, %eax
                 subl    $16, %esp
                 push    %eax
@@ -150,7 +153,7 @@ jloop:          # for j := 1 to 254 -
                 # sum := 0#
                 mov     $0, %bx
                 mov     %bx, sum
-		# -1,-1
+		        # -1,-1
                 mov     i, %bx
                 add     $-1, %bx
                 shl     $8, %bx
@@ -164,7 +167,7 @@ jloop:          # for j := 1 to 254 -
                 mov     $0, %ah
                 add     %ax, sum
 
-		# -1,0
+		        # -1,0
                 mov     i, %bx
                 add     $-1, %bx
                 shl     $8, %bx
@@ -178,7 +181,7 @@ jloop:          # for j := 1 to 254 -
                 mov     $0, %ah
                 add     %ax, sum
 
-		# -1,1
+		        # -1,1
                 mov     i, %bx
                 add     $-1, %bx
                 shl     $8, %bx
@@ -192,7 +195,7 @@ jloop:          # for j := 1 to 254 -
                 mov     $0, %ah
                 add     %ax, sum
 
-		# 0,-1
+		        # 0,-1
                 mov     i, %bx
                 add     $0, %bx
                 shl     $8, %bx
@@ -206,7 +209,7 @@ jloop:          # for j := 1 to 254 -
                 mov     $0, %ah
                 add     %ax, sum
 
-		# 0,0
+		        # 0,0
                 mov     i, %bx
                 add     $0, %bx
                 shl     $8, %bx
@@ -220,7 +223,7 @@ jloop:          # for j := 1 to 254 -
                 mov     $0, %ah
                 add     %ax, sum
 
-		# 0,1
+		        # 0,1
                 mov     i, %bx
                 add     $0, %bx
                 shl     $8, %bx
@@ -234,7 +237,7 @@ jloop:          # for j := 1 to 254 -
                 mov     $0, %ah
                 add     %ax, sum
 
-		# 1,-1
+		        # 1,-1
                 mov     i, %bx
                 add     $1, %bx
                 shl     $8, %bx
@@ -248,7 +251,7 @@ jloop:          # for j := 1 to 254 -
                 mov     $0, %ah
                 add     %ax, sum
 
-		# 1,0
+		        # 1,0
                 mov     i, %bx
                 add     $1, %bx
                 shl     $8, %bx
@@ -262,7 +265,7 @@ jloop:          # for j := 1 to 254 -
                 mov     $0, %ah
                 add     %ax, sum
 
-		# 1,1
+		        # 1,1
                 mov     i, %bx
                 add     $1, %bx
                 shl     $8, %bx
@@ -362,6 +365,7 @@ GoodCreate:     # Write to file
                 cmp     $251*256, %eax
                 je      GoodWrite
 
+                # Print error message in case of bad write
                 mov     $BadWriteMsg, %eax
                 subl    $16, %esp
                 push    %eax
